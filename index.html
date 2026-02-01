@@ -2,23 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Mind & Psychology Assessment</title>
+<title>Psychological Personality Assessment</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 :root{
   --primary:#6366f1;
-  --bg1:#020617;
-  --bg2:#0f172a;
+  --dark:#020617;
   --card:#ffffff;
-  --text:#0f172a;
   --muted:#64748b;
 }
 
 *{
-  box-sizing:border-box;
   margin:0;
   padding:0;
+  box-sizing:border-box;
   font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
 }
 
@@ -27,56 +25,94 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:20px;
   background:
-    radial-gradient(circle at top left, #818cf8 0%, transparent 40%),
-    radial-gradient(circle at bottom right, #38bdf8 0%, transparent 40%),
-    linear-gradient(135deg, var(--bg1), var(--bg2));
+    radial-gradient(circle at top left,#818cf8 0%,transparent 40%),
+    radial-gradient(circle at bottom right,#38bdf8 0%,transparent 40%),
+    linear-gradient(135deg,#020617,#0f172a);
+  padding:20px;
 }
 
 .app{
   width:100%;
-  max-width:560px;
+  max-width:600px;
   background:rgba(255,255,255,0.97);
-  border-radius:18px;
-  padding:30px;
-  box-shadow:0 30px 60px rgba(0,0,0,.25);
+  border-radius:20px;
+  padding:32px;
+  box-shadow:0 30px 70px rgba(0,0,0,.35);
+  animation:fadeIn .6s ease;
 }
 
-h1{font-size:1.7rem;margin-bottom:8px;}
-.subtitle{font-size:.9rem;color:var(--muted);margin-bottom:22px;}
-.progress,.timer{font-size:.85rem;margin-bottom:10px;}
-.timer{color:var(--primary);}
-.question{font-size:1.1rem;font-weight:500;margin-bottom:18px;}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
 
-.options{display:flex;flex-direction:column;gap:12px;}
+h1{font-size:1.8rem;margin-bottom:6px;}
+.subtitle{color:var(--muted);font-size:.9rem;margin-bottom:22px;}
+
+.progress,.timer{
+  font-size:.85rem;
+  margin-bottom:10px;
+}
+.timer{color:var(--primary);}
+
+.question{
+  font-size:1.15rem;
+  font-weight:500;
+  margin-bottom:18px;
+}
+
+.options{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
 
 .option{
-  padding:14px;
-  border-radius:10px;
+  padding:15px;
+  border-radius:12px;
   border:1px solid #e5e7eb;
   background:#fff;
   cursor:pointer;
-  text-align:left;
-  transition:.2s;
+  transition:.25s;
 }
 
 .option:hover{
+  transform:translateY(-2px);
   border-color:var(--primary);
-  box-shadow:0 6px 16px rgba(79,70,229,.15);
+  box-shadow:0 8px 20px rgba(79,70,229,.2);
 }
 
-.result h2{margin-bottom:12px;}
-.section{margin-bottom:16px;font-size:.95rem;line-height:1.6;}
-.disclaimer{font-size:.8rem;color:var(--muted);margin-top:20px;}
+.result{
+  animation:fadeIn .6s ease;
+}
+
+.section{
+  margin-bottom:16px;
+  line-height:1.6;
+  font-size:.95rem;
+}
+
+.match{
+  padding:14px;
+  background:#eef2ff;
+  border-radius:12px;
+  font-weight:600;
+}
+
+.disclaimer{
+  font-size:.8rem;
+  color:var(--muted);
+  margin-top:18px;
+}
 
 .restart{
   margin-top:20px;
-  padding:14px 28px;
-  background:linear-gradient(135deg,#6366f1,#4f46e5);
-  color:#fff;
+  padding:14px 30px;
   border:none;
   border-radius:999px;
+  background:linear-gradient(135deg,#6366f1,#4f46e5);
+  color:white;
   cursor:pointer;
 }
 </style>
@@ -86,47 +122,83 @@ h1{font-size:1.7rem;margin-bottom:8px;}
 <div class="app" id="app"></div>
 
 <script>
-/* ===== QUESTIONS ===== */
-const questions = [
- {q:"If all your memories disappeared, what would remain of you?",
-  o:["Nothing","Personality traits","Only biology","A core self beyond memory"], t:["conditioned","reflective","biological","aware"]},
+/* ===== QUESTIONS (24 TOTAL) ===== */
+const questions=[
+ {q:"If all your memories disappeared, what would remain?",
+  o:["Nothing","Personality traits","Biology","A core self"],t:["conditioned","reflective","biological","aware"]},
 
- {q:"Do you control your thoughts, or do they control you?",
-  o:["I control them","Mostly","Rarely","They control me"], t:["aware","aware","conditioned","fear"]},
+ {q:"Do you control your thoughts?",
+  o:["Yes","Mostly","Rarely","They control me"],t:["aware","aware","conditioned","fear"]},
 
- {q:"Which fear shapes human behavior the most?",
-  o:["Failure","Death","Rejection","Meaninglessness"], t:["fear","fear","fear","aware"]},
+ {q:"Which fear dominates humans most?",
+  o:["Failure","Death","Rejection","Meaninglessness"],t:["fear","fear","fear","aware"]},
 
- {q:"Is suffering necessary for growth?",
-  o:["Always","Never","Sometimes","Awareness matters more"], t:["fear","avoidant","reflective","aware"]},
+ {q:"Is suffering required for growth?",
+  o:["Always","Never","Sometimes","Awareness matters more"],t:["fear","avoidant","reflective","aware"]},
 
- {q:"If truth hurts and lies comfort, what is ethical?",
-  o:["Truth","Comfort","Context matters","Neither"], t:["principled","avoidant","reflective","detached"]},
+ {q:"Truth hurts, lies comfort. Ethical choice?",
+  o:["Truth","Comfort","Depends","Neither"],t:["principled","avoidant","reflective","detached"]},
 
- {q:"Are humans rational or emotional?",
-  o:["Rational","Emotional","Equal","Emotional first"], t:["detached","aware","reflective","aware"]},
+ {q:"Humans are mostly?",
+  o:["Rational","Emotional","Balanced","Emotional first"],t:["detached","aware","reflective","aware"]},
 
- {q:"Does free will truly exist?",
-  o:["Yes","No","Partially","Feels real even if false"], t:["autonomous","conditioned","reflective","aware"]},
+ {q:"Does free will exist?",
+  o:["Yes","No","Partly","Feels real"],t:["autonomous","conditioned","reflective","aware"]},
 
  {q:"What gives life meaning?",
-  o:["Happiness","Success","Purpose","Awareness"], t:["hedonic","conditioned","purposeful","aware"]},
+  o:["Happiness","Success","Purpose","Awareness"],t:["hedonic","conditioned","purposeful","aware"]},
+
+ {q:"Why stay unhappy?",
+  o:["Laziness","Fear","Identity","Comfort in pain"],t:["avoidant","fear","conditioned","fear"]},
+
+ {q:"Ego is?",
+  o:["Enemy","Tool","Both","Illusion"],t:["detached","autonomous","reflective","aware"]},
+
+ {q:"Do people want truth or comfort?",
+  o:["Truth","Comfort","Both","Comfort as truth"],t:["principled","fear","reflective","aware"]},
+
+ {q:"Is discipline freedom?",
+  o:["Yes","No","Sometimes","Through limits"],t:["autonomous","avoidant","reflective","aware"]},
+
+ {q:"Biggest human limitation?",
+  o:["IQ","Money","Fear","Conditioning"],t:["biological","conditioned","fear","conditioned"]},
+
+ {q:"If no judgment existed?",
+  o:["Nothing changes","Little","Much","Everything"],t:["conditioned","reflective","aware","autonomous"]},
+
+ {q:"Identity is?",
+  o:["Discovered","Constructed","Both","Illusion"],t:["reflective","conditioned","aware","aware"]},
+
+ {q:"Happiness is?",
+  o:["Goal","Byproduct","Both","Illusion"],t:["hedonic","aware","reflective","detached"]},
+
+ {q:"Are thoughts facts?",
+  o:["Yes","No","Sometimes","Emotionally"],t:["conditioned","aware","reflective","fear"]},
+
+ {q:"Comfort vs growth?",
+  o:["Opposites","Related","Sometimes","Excess comfort harms"],t:["detached","reflective","aware","aware"]},
+
+ {q:"Loneliness is lack of?",
+  o:["People","Connection","Both","Meaning"],t:["conditioned","aware","reflective","aware"]},
+
+ {q:"Healing is?",
+  o:["Forgetting","Understanding","Both","Acceptance"],t:["avoidant","aware","reflective","aware"]},
+
+ {q:"Awareness feels?",
+  o:["Painful","Neutral","Mixed","Initially painful"],t:["fear","detached","reflective","aware"]},
+
+ {q:"Society vs individual?",
+  o:["Society","Individual","Both","Neither"],t:["conditioned","autonomous","reflective","detached"]},
+
+ {q:"Overthinking is?",
+  o:["Intelligence","Insecurity","Both","Habit"],t:["detached","fear","reflective","conditioned"]},
 
  {q:"Why are you alive?",
-  o:["Biology","Chance","Purpose","I decide the meaning"], t:["biological","detached","purposeful","autonomous"]}
+  o:["Biology","Chance","Purpose","I create meaning"],t:["biological","detached","purposeful","autonomous"]}
 ];
 
-/* ===== TRAIT TRACKING ===== */
-const traits = {
- aware:0,
- conditioned:0,
- fear:0,
- autonomous:0,
- reflective:0,
- avoidant:0,
- purposeful:0
-};
-
+/* ===== TRAITS ===== */
+const traits={aware:0,conditioned:0,fear:0,autonomous:0,reflective:0,purposeful:0};
 let i=0,time=60,timer;
 const app=document.getElementById("app");
 
@@ -144,7 +216,7 @@ function showQ(){
  const q=questions[i];
  app.innerHTML=`
   <h1>Psychological Assessment</h1>
-  <div class="subtitle">Answer honestly. There are no right or wrong answers.</div>
+  <div class="subtitle">Answer honestly. No right or wrong.</div>
   <div class="progress">Question ${i+1} of ${questions.length}</div>
   <div class="timer" id="timer">Time left: 60s</div>
   <div class="question">${q.q}</div>
@@ -156,55 +228,59 @@ function showQ(){
 
 function ans(j){
  clearInterval(timer);
- const tag = questions[i].t[j];
- traits[tag]++;
+ traits[questions[i].t[j]]++;
  next();
 }
 
 function next(){
- i<questions.length-1 ? (i++,showQ()) : result();
+ i<questions.length-1?(i++,showQ()):result();
 }
 
 function result(){
- let dominant = Object.keys(traits).reduce((a,b)=>traits[a]>traits[b]?a:b);
+ const dominant=Object.keys(traits).reduce((a,b)=>traits[a]>traits[b]?a:b);
 
- let diagnosis="", guidance="";
+ const profiles={
+  aware:{
+   name:"Carl Jung",
+   text:"Your personality shows deep introspection and awareness of the unconscious mind."
+  },
+  autonomous:{
+   name:"Marcus Aurelius",
+   text:"You demonstrate inner control, self-discipline, and self-directed meaning."
+  },
+  reflective:{
+   name:"Buddha",
+   text:"Your answers reflect mindfulness, observation, and detachment from ego."
+  },
+  purposeful:{
+   name:"Steve Jobs",
+   text:"You create meaning through vision, purpose, and personal responsibility."
+  },
+  conditioned:{
+   name:"Sigmund Freud",
+   text:"Your mind is shaped strongly by internalized patterns and early conditioning."
+  },
+  fear:{
+   name:"Friedrich Nietzsche",
+   text:"You confront fear, suffering, and meaning through existential struggle."
+  }
+ };
 
- switch(dominant){
-  case "aware":
-   diagnosis="You show high self-awareness and introspection.";
-   guidance="Your strength is awareness, but avoid over-identifying with thoughts. Practice grounding and action.";
-   break;
-  case "conditioned":
-   diagnosis="Your thinking is strongly shaped by external conditioning.";
-   guidance="Begin questioning inherited beliefs. Journaling and solitude will help rebuild autonomy.";
-   break;
-  case "fear":
-   diagnosis="Fear plays a significant role in your decision-making.";
-   guidance="Fear is informative but not authoritative. Gradual exposure and rational inquiry are advised.";
-   break;
-  case "autonomous":
-   diagnosis="You display strong autonomy and self-directed meaning.";
-   guidance="Maintain this, but stay connected to others to avoid isolation.";
-   break;
-  case "avoidant":
-   diagnosis="You tend to avoid psychological discomfort.";
-   guidance="Growth requires tolerating discomfort. Start with small, deliberate challenges.";
-   break;
-  default:
-   diagnosis="You show a reflective but unstructured mindset.";
-   guidance="Clarify values and align actions consciously.";
- }
+ const p=profiles[dominant];
 
  app.innerHTML=`
-  <h1>Psychological Insight</h1>
-  <div class="section"><strong>Personality Observation:</strong><br>${diagnosis}</div>
-  <div class="section"><strong>Corrective Guidance:</strong><br>${guidance}</div>
-  <div class="disclaimer">
-   This assessment is for self-reflection and educational purposes only and is not a medical diagnosis.
-  </div>
-  <button class="restart" onclick="restart()">Restart Assessment</button>
- `;
+  <div class="result">
+   <h1>Your Psychological Profile</h1>
+   <div class="section"><strong>Dominant Pattern:</strong> ${dominant}</div>
+   <div class="section match">You most closely align with: ${p.name}</div>
+   <div class="section">${p.text}</div>
+   <div class="section"><strong>Clinical Guidance:</strong><br>
+   Strengthen awareness without isolation. Balance insight with grounded action.</div>
+   <div class="disclaimer">
+    This assessment is for self-reflection and education only. Not a medical diagnosis.
+   </div>
+   <button class="restart" onclick="restart()">Restart</button>
+  </div>`;
 }
 
 function restart(){
@@ -217,4 +293,3 @@ showQ();
 </script>
 </body>
 </html>
-
