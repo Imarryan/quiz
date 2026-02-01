@@ -11,11 +11,11 @@
   --card: #181c33;
   --accent: #6cf2c2;
   --muted: #9aa0c3;
-  --danger: #ff6b6b;
   --radius: 14px;
-  --transition: 0.4s ease;
   font-family: Inter, system-ui, sans-serif;
 }
+
+html { font-size: clamp(14px, 1.2vw, 16px); }
 
 body {
   margin: 0;
@@ -26,25 +26,20 @@ body {
 .container {
   max-width: 720px;
   margin: auto;
-  padding: 24px;
+  padding: clamp(16px, 4vw, 32px);
 }
 
 .card {
   background: var(--card);
   border-radius: var(--radius);
-  padding: 28px;
+  padding: clamp(18px, 4vw, 32px);
   box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-  animation: fadeIn 0.6s ease;
+  animation: slideFadeIn 0.5s cubic-bezier(.22,.61,.36,1);
 }
 
-h1,h2,h3 {
-  margin-top: 0;
-}
+h1,h2,h3 { margin-top: 0; }
 
-p {
-  color: var(--muted);
-  line-height: 1.6;
-}
+p { color: var(--muted); line-height: 1.6; }
 
 button {
   background: linear-gradient(135deg, var(--accent), #4fd1ff);
@@ -54,12 +49,10 @@ button {
   color: #0b0f1a;
   font-weight: 600;
   cursor: pointer;
-  transition: transform var(--transition);
 }
 
-button:hover {
-  transform: translateY(-2px);
-}
+button:hover { transform: translateY(-2px); }
+button:active { transform: scale(0.96); }
 
 .progress {
   height: 6px;
@@ -72,28 +65,29 @@ button:hover {
 .progress span {
   display: block;
   height: 100%;
-  background: var(--accent);
   width: 0%;
+  background: linear-gradient(90deg, var(--accent), #4fd1ff, var(--accent));
+  background-size: 200% 100%;
+  animation: flow 2s linear infinite;
   transition: width 0.4s ease;
 }
 
 .scale {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 24px;
 }
 
 .scale button {
-  flex: 1;
-  margin: 0 4px;
-  padding: 12px;
+  flex: 1 1 calc(50% - 8px);
+  min-width: 120px;
   background: #2a2f55;
   color: white;
 }
 
-.scale button:hover {
-  background: var(--accent);
-  color: #000;
+@media (min-width: 520px) {
+  .scale button { flex: 1; }
 }
 
 .skip {
@@ -102,9 +96,7 @@ button:hover {
   margin-top: 12px;
 }
 
-.result-bar {
-  margin: 12px 0;
-}
+.result-bar { margin: 14px 0; }
 
 .bar {
   height: 10px;
@@ -116,16 +108,31 @@ button:hover {
 .bar span {
   display: block;
   height: 100%;
+  width: 0%;
   background: linear-gradient(90deg, var(--accent), #4fd1ff);
+  transition: width 0.9s cubic-bezier(.22,.61,.36,1);
 }
 
-details {
-  margin-top: 14px;
+hr {
+  border: none;
+  border-top: 1px solid #2a2f55;
+  margin: 28px 0;
 }
 
-@keyframes fadeIn {
-  from {opacity: 0; transform: translateY(10px);}
-  to {opacity: 1; transform: translateY(0);}
+ul li { margin-bottom: 6px; }
+
+@keyframes slideFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes flow {
+  from { background-position: 0% 0; }
+  to { background-position: 200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
 }
 </style>
 </head>
@@ -136,136 +143,71 @@ details {
 </div>
 
 <script>
-/* -------------------------------
-   DATA MODEL
--------------------------------- */
-
 const DIMENSIONS = {
-  AC: { name: "Awareness vs Conditioning", left: "Conditioned", right: "Aware" },
-  FA: { name: "Fear-driven vs Autonomous", left: "Fear-driven", right: "Autonomous" },
-  IR: { name: "Impulsive vs Reflective", left: "Impulsive", right: "Reflective" },
-  HP: { name: "Hedonic vs Purpose-driven", left: "Hedonic", right: "Purpose-driven" }
+  AC: { name: "Awareness vs Conditioning" },
+  FA: { name: "Fear-driven vs Autonomous" },
+  IR: { name: "Impulsive vs Reflective" },
+  HP: { name: "Hedonic vs Purpose-driven" }
 };
 
 const QUESTIONS = [
-  // Awareness vs Conditioning (12)
   { d:"AC", t:"I regularly question why I believe what I believe.", s:1 },
   { d:"AC", t:"I follow social norms without thinking much about them.", s:-1 },
-  { d:"AC", t:"I notice how my past shapes my current reactions.", s:1 },
-  { d:"AC", t:"Most of my habits run on autopilot.", s:-1 },
-  { d:"AC", t:"I actively examine my assumptions.", s:1 },
-  { d:"AC", t:"I rarely reflect on how culture influences me.", s:-1 },
-  { d:"AC", t:"I can observe my thoughts without immediately acting on them.", s:1 },
-  { d:"AC", t:"I do things mainly because they’re expected of me.", s:-1 },
-  { d:"AC", t:"I consciously choose which beliefs to keep.", s:1 },
-  { d:"AC", t:"I seldom analyze my own motivations.", s:-1 },
-  { d:"AC", t:"I recognize patterns in my own behavior.", s:1 },
-  { d:"AC", t:"I accept ideas without much internal scrutiny.", s:-1 },
-
-  // Fear vs Autonomous (12)
   { d:"FA", t:"Fear of failure strongly influences my decisions.", s:-1 },
   { d:"FA", t:"I act based on internal values, even under pressure.", s:1 },
-  { d:"FA", t:"Avoiding discomfort often drives my choices.", s:-1 },
-  { d:"FA", t:"I feel self-directed rather than controlled.", s:1 },
-  { d:"FA", t:"I hesitate when outcomes feel uncertain.", s:-1 },
-  { d:"FA", t:"I trust myself to adapt if things go wrong.", s:1 },
-  { d:"FA", t:"Anxiety frequently limits my actions.", s:-1 },
-  { d:"FA", t:"I choose paths aligned with my autonomy.", s:1 },
-  { d:"FA", t:"Fear of judgment shapes my behavior.", s:-1 },
-  { d:"FA", t:"I feel free to define my own success.", s:1 },
-  { d:"FA", t:"I avoid risks primarily to feel safe.", s:-1 },
-  { d:"FA", t:"I feel ownership over my life direction.", s:1 },
-
-  // Impulsive vs Reflective (12)
   { d:"IR", t:"I often act before thinking things through.", s:-1 },
   { d:"IR", t:"I pause to consider long-term consequences.", s:1 },
-  { d:"IR", t:"My emotions quickly translate into actions.", s:-1 },
-  { d:"IR", t:"I analyze situations before responding.", s:1 },
-  { d:"IR", t:"I rely on gut reactions more than reasoning.", s:-1 },
-  { d:"IR", t:"I enjoy thinking deeply about decisions.", s:1 },
-  { d:"IR", t:"I act quickly to resolve tension.", s:-1 },
-  { d:"IR", t:"I reflect on outcomes to improve future choices.", s:1 },
-  { d:"IR", t:"I make snap decisions under stress.", s:-1 },
-  { d:"IR", t:"I deliberately slow myself down to think.", s:1 },
-  { d:"IR", t:"I regret acting too fast.", s:-1 },
-  { d:"IR", t:"I mentally rehearse scenarios before acting.", s:1 },
-
-  // Hedonic vs Purpose (12)
   { d:"HP", t:"I prioritize enjoyment over long-term meaning.", s:-1 },
-  { d:"HP", t:"I feel driven by a sense of purpose.", s:1 },
-  { d:"HP", t:"I chase pleasure when stressed.", s:-1 },
-  { d:"HP", t:"Meaning matters more to me than comfort.", s:1 },
-  { d:"HP", t:"I avoid effort unless it feels rewarding now.", s:-1 },
-  { d:"HP", t:"I tolerate discomfort for future goals.", s:1 },
-  { d:"HP", t:"Fun is a higher priority than fulfillment.", s:-1 },
-  { d:"HP", t:"I align actions with long-term values.", s:1 },
-  { d:"HP", t:"I seek immediate gratification.", s:-1 },
-  { d:"HP", t:"I think in terms of legacy and contribution.", s:1 },
-  { d:"HP", t:"Pleasure motivates me more than meaning.", s:-1 },
-  { d:"HP", t:"I’m willing to sacrifice comfort for purpose.", s:1 }
+  { d:"HP", t:"I feel driven by a sense of purpose.", s:1 }
 ];
 
-/* -------------------------------
-   STATE
--------------------------------- */
-
-let state = {
-  index: 0,
-  answers: []
-};
-
-/* -------------------------------
-   SCORING
--------------------------------- */
-
-function calculateScores() {
-  let scores = { AC:0, FA:0, IR:0, HP:0 };
-  let counts = { AC:0, FA:0, IR:0, HP:0 };
-
-  state.answers.forEach((a,i) => {
-    const q = QUESTIONS[i];
-    if (a !== null) {
-      scores[q.d] += a * q.s;
-      counts[q.d]++;
-    }
-  });
-
-  for (let d in scores) {
-    const max = counts[d] * 2;
-    scores[d] = Math.round((scores[d] / max) * 100);
+const FIGURE_MAP = [
+  {
+    criteria: s => s.FA > 30 && s.IR > 30 && s.HP > 30,
+    description:
+      "Your pattern shows strong autonomy, reflective thinking, and a purpose-driven orientation.",
+    figures: [
+      { name:"Elon Musk", traits:"long-term vision, high risk tolerance, self-directed execution" },
+      { name:"Marie Curie", traits:"deep reflection, persistence, purpose over comfort" },
+      { name:"Nelson Mandela", traits:"internal values, long-term moral purpose, restraint" }
+    ]
+  },
+  {
+    criteria: s => s.AC > 30 && s.IR > 30,
+    description:
+      "Your pattern emphasizes awareness and deliberate reflection before action.",
+    figures: [
+      { name:"Albert Einstein", traits:"conceptual depth, independent thinking, reflection" },
+      { name:"Hannah Arendt", traits:"metacognitive awareness, reflective judgment" }
+    ]
+  },
+  {
+    criteria: s => s.FA > 30 && s.IR < -20,
+    description:
+      "Your pattern combines autonomy with rapid, instinctive action.",
+    figures: [
+      { name:"Richard Branson", traits:"decisive action, comfort with uncertainty" },
+      { name:"Theodore Roosevelt", traits:"energy, action orientation, decisiveness" }
+    ]
   }
-  return scores;
-}
+];
 
-function codeFromScores(s) {
-  return [
-    s.AC >= 0 ? "A" : "C",
-    s.FA >= 0 ? "A" : "F",
-    s.IR >= 0 ? "R" : "I",
-    s.HP >= 0 ? "P" : "H"
-  ].join("");
-}
-
-/* -------------------------------
-   UI RENDERING
--------------------------------- */
-
+let state = { index: 0, answers: [] };
 const app = document.getElementById("app");
-
-function renderIntro() {
-  app.innerHTML = `
-    <div class="card">
-      <h1>Personality Pattern Assessment</h1>
-      <p>This assessment explores behavioral and cognitive patterns — not labels, diagnoses, or fixed identities.</p>
-      <p>⏱ ~8–10 minutes • No timer • Skip allowed</p>
-      <button onclick="start()">Start Assessment</button>
-    </div>`;
-}
 
 function start() {
   state.index = 0;
   state.answers = Array(QUESTIONS.length).fill(null);
   renderQuestion();
+}
+
+function renderIntro() {
+  app.innerHTML = `
+    <div class="card">
+      <h1>Personality Pattern Assessment</h1>
+      <p>Explores behavioral and cognitive patterns. Not a diagnosis.</p>
+      <button onclick="start()">Start Assessment</button>
+    </div>`;
 }
 
 function renderQuestion() {
@@ -277,57 +219,88 @@ function renderQuestion() {
     <div class="card">
       <h3>${q.t}</h3>
       <div class="scale">
-        ${[-2,-1,0,1,2].map(v=>`<button onclick="answer(${v})">${label(v)}</button>`).join("")}
+        ${[-2,-1,0,1,2].map(v=>`
+          <button onclick="answer(${v})">
+            ${["Strongly Disagree","Disagree","Neutral","Agree","Strongly Agree"][v+2]}
+          </button>`).join("")}
       </div>
       <button class="skip" onclick="answer(null)">Skip</button>
     </div>`;
 }
 
-function label(v){
-  return ["Strongly Disagree","Disagree","Neutral","Agree","Strongly Agree"][v+2];
+function answer(v) {
+  state.answers[state.index++] = v;
+  state.index < QUESTIONS.length ? renderQuestion() : renderResults();
 }
 
-function answer(v) {
-  state.answers[state.index] = v;
-  state.index++;
-  if (state.index < QUESTIONS.length) renderQuestion();
-  else renderResults();
+function calculateScores() {
+  let scores = { AC:0, FA:0, IR:0, HP:0 };
+  let counts = { AC:0, FA:0, IR:0, HP:0 };
+
+  state.answers.forEach((a,i)=>{
+    if(a!==null){
+      const q = QUESTIONS[i];
+      scores[q.d] += a * q.s;
+      counts[q.d]++;
+    }
+  });
+
+  for (let d in scores) {
+    const max = counts[d] * 2 || 1;
+    scores[d] = Math.round((scores[d] / max) * 100);
+  }
+  return scores;
+}
+
+function getFigureMatch(scores) {
+  return FIGURE_MAP.find(m => m.criteria(scores)) || null;
 }
 
 function renderResults() {
   const scores = calculateScores();
-  const code = codeFromScores(scores);
-  localStorage.setItem("lastResult", JSON.stringify({scores,code}));
+  const match = getFigureMatch(scores);
 
   app.innerHTML = `
     <div class="card">
-      <h1>${code}</h1>
-      <p><strong>Your dominant personality pattern</strong></p>
+      <h1>Results</h1>
+
       ${Object.entries(scores).map(([k,v])=>`
         <div class="result-bar">
           <small>${DIMENSIONS[k].name}</small>
-          <div class="bar"><span style="width:${Math.abs(v)}%"></span></div>
-        </div>
-      `).join("")}
+          <div class="bar"><span data-width="${Math.abs(v)}%"></span></div>
+        </div>`).join("")}
 
-      <details>
-        <summary>Strengths</summary>
-        <p>Pattern-based strengths derived from autonomy, reflection, and purpose alignment.</p>
-      </details>
-      <details>
-        <summary>Blind Spots</summary>
-        <p>Overextension of dominant traits can reduce adaptability.</p>
-      </details>
-      <details>
-        <summary>Growth Recommendations</summary>
-        <p>Develop balance in weaker dimensions to increase resilience.</p>
-      </details>
+      ${match ? `
+        <hr>
+        <h3>Notable Figures With Similar Patterns</h3>
+        <p>${match.description}
+        These traits <em>share similarities with</em> patterns often associated with:</p>
+
+        <ul>
+          ${match.figures.map(f=>`
+            <li><strong>${f.name}</strong> — ${f.traits}</li>
+          `).join("")}
+        </ul>
+
+        <p style="font-size:0.85rem;color:var(--muted)">
+          These comparisons are illustrative and based on publicly observed traits,
+          not psychological evaluation.
+        </p>
+      ` : ""}
 
       <button onclick="start()">Retake Test</button>
-    </div>`;
+    </div>
+  `;
+
+  requestAnimationFrame(()=>{
+    document.querySelectorAll(".bar span").forEach(b=>{
+      b.style.width = b.dataset.width;
+    });
+  });
 }
 
 renderIntro();
 </script>
 </body>
 </html>
+
