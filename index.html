@@ -2,71 +2,81 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Personality Pattern Assessment</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
-/* =========================
-   DESIGN SYSTEM
-========================= */
 :root {
-  --primary: #6366f1;
-  --bg-dark: #020617;
-  --bg-light: #f8fafc;
-  --card: #ffffff;
-  --text: #0f172a;
-  --muted: #64748b;
-  --radius: 16px;
-  --transition: 0.35s ease;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  --bg: #0f1220;
+  --card: #181c33;
+  --accent: #6cf2c2;
+  --muted: #9aa0c3;
+  --danger: #ff6b6b;
+  --radius: 14px;
+  --transition: 0.4s ease;
+  font-family: Inter, system-ui, sans-serif;
 }
 
 body {
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, #818cf8 0%, transparent 40%),
-    radial-gradient(circle at bottom right, #38bdf8 0%, transparent 40%),
-    linear-gradient(135deg, #020617, #0f172a);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+  margin: 0;
+  background: radial-gradient(circle at top, #1b2045, var(--bg));
+  color: white;
 }
 
-.app {
-  width: 100%;
+.container {
   max-width: 720px;
-  background: rgba(255,255,255,0.97);
+  margin: auto;
+  padding: 24px;
+}
+
+.card {
+  background: var(--card);
   border-radius: var(--radius);
-  padding: 32px;
-  box-shadow: 0 40px 80px rgba(0,0,0,.35);
-  animation: fadeIn .6s ease;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  animation: fadeIn 0.6s ease;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+h1,h2,h3 {
+  margin-top: 0;
 }
 
-h1 { font-size: 1.9rem; margin-bottom: 8px; }
-h2 { font-size: 1.4rem; margin-bottom: 10px; }
-p { color: var(--muted); line-height: 1.6; }
+p {
+  color: var(--muted);
+  line-height: 1.6;
+}
 
 button {
+  background: linear-gradient(135deg, var(--accent), #4fd1ff);
   border: none;
+  padding: 14px 20px;
+  border-radius: 999px;
+  color: #0b0f1a;
+  font-weight: 600;
   cursor: pointer;
-  transition: var(--transition);
+  transition: transform var(--transition);
 }
 
-/* =========================
-   LIKERT SCALE
-========================= */
+button:hover {
+  transform: translateY(-2px);
+}
+
+.progress {
+  height: 6px;
+  background: #2a2f55;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
 .scale {
   display: flex;
   justify-content: space-between;
@@ -76,238 +86,248 @@ button {
 .scale button {
   flex: 1;
   margin: 0 4px;
-  padding: 14px 8px;
-  border-radius: 999px;
-  background: #eef2ff;
-  font-size: 0.8rem;
+  padding: 12px;
+  background: #2a2f55;
+  color: white;
 }
 
 .scale button:hover {
-  background: var(--primary);
-  color: #fff;
-  transform: translateY(-2px);
+  background: var(--accent);
+  color: #000;
 }
 
-/* =========================
-   PROGRESS
-========================= */
-.progress {
-  height: 8px;
-  background: #e5e7eb;
-  border-radius: 999px;
-  overflow: hidden;
-  margin: 20px 0;
+.skip {
+  background: transparent;
+  color: var(--muted);
+  margin-top: 12px;
 }
 
-.progress-bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #6366f1, #4f46e5);
-  transition: width 0.4s ease;
+.result-bar {
+  margin: 12px 0;
 }
 
-/* =========================
-   RESULT VISUALS
-========================= */
 .bar {
-  margin: 10px 0;
-}
-.bar-label {
-  font-size: 0.85rem;
-  margin-bottom: 4px;
-}
-.bar-track {
   height: 10px;
-  background: #e5e7eb;
+  background: #2a2f55;
   border-radius: 999px;
   overflow: hidden;
 }
-.bar-fill {
+
+.bar span {
+  display: block;
   height: 100%;
-  background: var(--primary);
-  width: 50%;
+  background: linear-gradient(90deg, var(--accent), #4fd1ff);
 }
 
-/* =========================
-   EXPANDABLE SECTIONS
-========================= */
 details {
   margin-top: 14px;
 }
-summary {
-  font-weight: 600;
-  cursor: pointer;
-}
-details p {
-  margin-top: 8px;
-  font-size: 0.9rem;
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
 }
 </style>
 </head>
 
 <body>
-<div class="app" id="app"></div>
+<div class="container">
+  <div id="app"></div>
+</div>
 
 <script>
-/* =====================================================
+/* -------------------------------
    DATA MODEL
-===================================================== */
+-------------------------------- */
 
-/*
-Each question:
-- dimension: A/C, F/A, R/I, P/H
-- direction: +1 or -1
-*/
-const questions = [
-  // Awareness vs Conditioning (A/C)
-  { text: "I often observe my own thoughts rather than getting lost in them.", dim: "AC", dir: 1 },
-  { text: "Most of my beliefs come from my upbringing or culture.", dim: "AC", dir: -1 },
-  // (Add 8 more AC questions)
-
-  // Fear vs Autonomy (F/A)
-  { text: "Fear often stops me from acting even when I know better.", dim: "FA", dir: -1 },
-  { text: "I act according to my values even under pressure.", dim: "FA", dir: 1 },
-  // (Add 8 more FA questions)
-
-  // Reflective vs Impulsive (R/I)
-  { text: "I reflect deeply before making important decisions.", dim: "RI", dir: 1 },
-  { text: "I often act first and think later.", dim: "RI", dir: -1 },
-  // (Add 8 more RI questions)
-
-  // Purpose vs Hedonic (P/H)
-  { text: "Long-term meaning matters more than short-term pleasure.", dim: "PH", dir: 1 },
-  { text: "I prioritize enjoyment over future goals.", dim: "PH", dir: -1 },
-  // (Add 8 more PH questions)
-];
-
-// Likert mapping
-const SCALE = [2, 1, 0, -1, -2];
-
-// Scores per dimension
-let scores = {
-  AC: 0,
-  FA: 0,
-  RI: 0,
-  PH: 0
+const DIMENSIONS = {
+  AC: { name: "Awareness vs Conditioning", left: "Conditioned", right: "Aware" },
+  FA: { name: "Fear-driven vs Autonomous", left: "Fear-driven", right: "Autonomous" },
+  IR: { name: "Impulsive vs Reflective", left: "Impulsive", right: "Reflective" },
+  HP: { name: "Hedonic vs Purpose-driven", left: "Hedonic", right: "Purpose-driven" }
 };
 
-let index = 0;
+const QUESTIONS = [
+  // Awareness vs Conditioning (12)
+  { d:"AC", t:"I regularly question why I believe what I believe.", s:1 },
+  { d:"AC", t:"I follow social norms without thinking much about them.", s:-1 },
+  { d:"AC", t:"I notice how my past shapes my current reactions.", s:1 },
+  { d:"AC", t:"Most of my habits run on autopilot.", s:-1 },
+  { d:"AC", t:"I actively examine my assumptions.", s:1 },
+  { d:"AC", t:"I rarely reflect on how culture influences me.", s:-1 },
+  { d:"AC", t:"I can observe my thoughts without immediately acting on them.", s:1 },
+  { d:"AC", t:"I do things mainly because they’re expected of me.", s:-1 },
+  { d:"AC", t:"I consciously choose which beliefs to keep.", s:1 },
+  { d:"AC", t:"I seldom analyze my own motivations.", s:-1 },
+  { d:"AC", t:"I recognize patterns in my own behavior.", s:1 },
+  { d:"AC", t:"I accept ideas without much internal scrutiny.", s:-1 },
 
-/* =====================================================
-   RENDERING
-===================================================== */
+  // Fear vs Autonomous (12)
+  { d:"FA", t:"Fear of failure strongly influences my decisions.", s:-1 },
+  { d:"FA", t:"I act based on internal values, even under pressure.", s:1 },
+  { d:"FA", t:"Avoiding discomfort often drives my choices.", s:-1 },
+  { d:"FA", t:"I feel self-directed rather than controlled.", s:1 },
+  { d:"FA", t:"I hesitate when outcomes feel uncertain.", s:-1 },
+  { d:"FA", t:"I trust myself to adapt if things go wrong.", s:1 },
+  { d:"FA", t:"Anxiety frequently limits my actions.", s:-1 },
+  { d:"FA", t:"I choose paths aligned with my autonomy.", s:1 },
+  { d:"FA", t:"Fear of judgment shapes my behavior.", s:-1 },
+  { d:"FA", t:"I feel free to define my own success.", s:1 },
+  { d:"FA", t:"I avoid risks primarily to feel safe.", s:-1 },
+  { d:"FA", t:"I feel ownership over my life direction.", s:1 },
+
+  // Impulsive vs Reflective (12)
+  { d:"IR", t:"I often act before thinking things through.", s:-1 },
+  { d:"IR", t:"I pause to consider long-term consequences.", s:1 },
+  { d:"IR", t:"My emotions quickly translate into actions.", s:-1 },
+  { d:"IR", t:"I analyze situations before responding.", s:1 },
+  { d:"IR", t:"I rely on gut reactions more than reasoning.", s:-1 },
+  { d:"IR", t:"I enjoy thinking deeply about decisions.", s:1 },
+  { d:"IR", t:"I act quickly to resolve tension.", s:-1 },
+  { d:"IR", t:"I reflect on outcomes to improve future choices.", s:1 },
+  { d:"IR", t:"I make snap decisions under stress.", s:-1 },
+  { d:"IR", t:"I deliberately slow myself down to think.", s:1 },
+  { d:"IR", t:"I regret acting too fast.", s:-1 },
+  { d:"IR", t:"I mentally rehearse scenarios before acting.", s:1 },
+
+  // Hedonic vs Purpose (12)
+  { d:"HP", t:"I prioritize enjoyment over long-term meaning.", s:-1 },
+  { d:"HP", t:"I feel driven by a sense of purpose.", s:1 },
+  { d:"HP", t:"I chase pleasure when stressed.", s:-1 },
+  { d:"HP", t:"Meaning matters more to me than comfort.", s:1 },
+  { d:"HP", t:"I avoid effort unless it feels rewarding now.", s:-1 },
+  { d:"HP", t:"I tolerate discomfort for future goals.", s:1 },
+  { d:"HP", t:"Fun is a higher priority than fulfillment.", s:-1 },
+  { d:"HP", t:"I align actions with long-term values.", s:1 },
+  { d:"HP", t:"I seek immediate gratification.", s:-1 },
+  { d:"HP", t:"I think in terms of legacy and contribution.", s:1 },
+  { d:"HP", t:"Pleasure motivates me more than meaning.", s:-1 },
+  { d:"HP", t:"I’m willing to sacrifice comfort for purpose.", s:1 }
+];
+
+/* -------------------------------
+   STATE
+-------------------------------- */
+
+let state = {
+  index: 0,
+  answers: []
+};
+
+/* -------------------------------
+   SCORING
+-------------------------------- */
+
+function calculateScores() {
+  let scores = { AC:0, FA:0, IR:0, HP:0 };
+  let counts = { AC:0, FA:0, IR:0, HP:0 };
+
+  state.answers.forEach((a,i) => {
+    const q = QUESTIONS[i];
+    if (a !== null) {
+      scores[q.d] += a * q.s;
+      counts[q.d]++;
+    }
+  });
+
+  for (let d in scores) {
+    const max = counts[d] * 2;
+    scores[d] = Math.round((scores[d] / max) * 100);
+  }
+  return scores;
+}
+
+function codeFromScores(s) {
+  return [
+    s.AC >= 0 ? "A" : "C",
+    s.FA >= 0 ? "A" : "F",
+    s.IR >= 0 ? "R" : "I",
+    s.HP >= 0 ? "P" : "H"
+  ].join("");
+}
+
+/* -------------------------------
+   UI RENDERING
+-------------------------------- */
+
 const app = document.getElementById("app");
 
 function renderIntro() {
   app.innerHTML = `
-    <h1>Personality Pattern Assessment</h1>
-    <p>
-      This assessment explores how you think, decide, and relate to the world.
-      There are no right or wrong answers.
-    </p>
-    <p><strong>Time:</strong> ~10 minutes</p>
-    <button onclick="startTest()" style="margin-top:20px;padding:14px 30px;border-radius:999px;background:var(--primary);color:white;">
-      Begin Assessment
-    </button>
-  `;
+    <div class="card">
+      <h1>Personality Pattern Assessment</h1>
+      <p>This assessment explores behavioral and cognitive patterns — not labels, diagnoses, or fixed identities.</p>
+      <p>⏱ ~8–10 minutes • No timer • Skip allowed</p>
+      <button onclick="start()">Start Assessment</button>
+    </div>`;
 }
 
-function startTest() {
-  index = 0;
+function start() {
+  state.index = 0;
+  state.answers = Array(QUESTIONS.length).fill(null);
   renderQuestion();
 }
 
 function renderQuestion() {
-  const q = questions[index];
-  const progress = ((index) / questions.length) * 100;
+  const q = QUESTIONS[state.index];
+  const progress = Math.round((state.index / QUESTIONS.length) * 100);
 
   app.innerHTML = `
-    <div class="progress"><div class="progress-bar" style="width:${progress}%"></div></div>
-    <h2>${q.text}</h2>
-    <div class="scale">
-      ${["Strongly Agree","Agree","Neutral","Disagree","Strongly Disagree"]
-        .map((l,i)=>`<button onclick="answer(${i})">${l}</button>`).join("")}
-    </div>
-  `;
+    <div class="progress"><span style="width:${progress}%"></span></div>
+    <div class="card">
+      <h3>${q.t}</h3>
+      <div class="scale">
+        ${[-2,-1,0,1,2].map(v=>`<button onclick="answer(${v})">${label(v)}</button>`).join("")}
+      </div>
+      <button class="skip" onclick="answer(null)">Skip</button>
+    </div>`;
 }
 
-function answer(choice) {
-  const q = questions[index];
-  scores[q.dim] += SCALE[choice] * q.dir;
-  index++;
-  if (index < questions.length) renderQuestion();
+function label(v){
+  return ["Strongly Disagree","Disagree","Neutral","Agree","Strongly Agree"][v+2];
+}
+
+function answer(v) {
+  state.answers[state.index] = v;
+  state.index++;
+  if (state.index < QUESTIONS.length) renderQuestion();
   else renderResults();
 }
 
-/* =====================================================
-   RESULTS
-===================================================== */
 function renderResults() {
-  // Normalize to -100 → +100
-  const norm = d => Math.max(-100, Math.min(100, d * 5));
-
-  const result = {
-    AC: norm(scores.AC),
-    FA: norm(scores.FA),
-    RI: norm(scores.RI),
-    PH: norm(scores.PH)
-  };
-
-  const code =
-    (result.AC >= 0 ? "A" : "C") +
-    (result.FA >= 0 ? "A" : "F") +
-    (result.RI >= 0 ? "R" : "I") +
-    (result.PH >= 0 ? "P" : "H");
-
-  localStorage.setItem("lastResult", JSON.stringify({ result, code }));
+  const scores = calculateScores();
+  const code = codeFromScores(scores);
+  localStorage.setItem("lastResult", JSON.stringify({scores,code}));
 
   app.innerHTML = `
-    <h1>Your Personality Pattern</h1>
-    <h2>${code}</h2>
+    <div class="card">
+      <h1>${code}</h1>
+      <p><strong>Your dominant personality pattern</strong></p>
+      ${Object.entries(scores).map(([k,v])=>`
+        <div class="result-bar">
+          <small>${DIMENSIONS[k].name}</small>
+          <div class="bar"><span style="width:${Math.abs(v)}%"></span></div>
+        </div>
+      `).join("")}
 
-    ${renderBar("Awareness vs Conditioning", result.AC)}
-    ${renderBar("Autonomy vs Fear", result.FA)}
-    ${renderBar("Reflective vs Impulsive", result.RI)}
-    ${renderBar("Purpose vs Hedonic", result.PH)}
+      <details>
+        <summary>Strengths</summary>
+        <p>Pattern-based strengths derived from autonomy, reflection, and purpose alignment.</p>
+      </details>
+      <details>
+        <summary>Blind Spots</summary>
+        <p>Overextension of dominant traits can reduce adaptability.</p>
+      </details>
+      <details>
+        <summary>Growth Recommendations</summary>
+        <p>Develop balance in weaker dimensions to increase resilience.</p>
+      </details>
 
-    <details>
-      <summary>Strengths</summary>
-      <p>You show consistency in how you process information and act on values.</p>
-    </details>
-
-    <details>
-      <summary>Blind Spots</summary>
-      <p>Over-identifying with one side can reduce flexibility.</p>
-    </details>
-
-    <details>
-      <summary>Growth Recommendations</summary>
-      <p>Balance awareness with action. Balance purpose with enjoyment.</p>
-    </details>
-
-    <p style="margin-top:20px;font-size:.8rem;color:var(--muted);">
-      This assessment is non-clinical and intended for self-reflection only.
-    </p>
-  `;
+      <button onclick="start()">Retake Test</button>
+    </div>`;
 }
 
-function renderBar(label, value) {
-  const pct = (value + 100) / 2;
-  return `
-    <div class="bar">
-      <div class="bar-label">${label} (${value}%)</div>
-      <div class="bar-track">
-        <div class="bar-fill" style="width:${pct}%"></div>
-      </div>
-    </div>
-  `;
-}
-
-/* =====================================================
-   INIT
-===================================================== */
 renderIntro();
 </script>
 </body>
 </html>
-
