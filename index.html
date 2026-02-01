@@ -7,215 +7,142 @@
 
 <style>
 :root {
-  --bg: #0f1220;
-  --card: #181c33;
-  --accent: #6cf2c2;
-  --muted: #9aa0c3;
-  --radius: 14px;
+  --bg:#0f1220; --card:#181c33; --accent:#6cf2c2;
+  --muted:#9aa0c3; --radius:14px;
   font-family: Inter, system-ui, sans-serif;
 }
-
-html { font-size: clamp(14px, 1.2vw, 16px); }
-
+html { font-size: clamp(14px,1.2vw,16px); }
 body {
-  margin: 0;
-  background: radial-gradient(circle at top, #1b2045, var(--bg));
-  color: white;
+  margin:0; background:radial-gradient(circle at top,#1b2045,var(--bg));
+  color:white;
 }
-
-.container {
-  max-width: 720px;
-  margin: auto;
-  padding: clamp(16px, 4vw, 32px);
-}
-
+.container { max-width:720px; margin:auto; padding:24px; }
 .card {
-  background: var(--card);
-  border-radius: var(--radius);
-  padding: clamp(18px, 4vw, 32px);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-  animation: slideFadeIn 0.5s cubic-bezier(.22,.61,.36,1);
+  background:var(--card); border-radius:var(--radius);
+  padding:24px; box-shadow:0 20px 60px rgba(0,0,0,.4);
+  animation:fadeUp .4s ease;
 }
-
-h1,h2,h3 { margin-top: 0; }
-
-p { color: var(--muted); line-height: 1.6; }
-
+h1,h2,h3 { margin-top:0; }
+p { color:var(--muted); line-height:1.6; }
 button {
-  background: linear-gradient(135deg, var(--accent), #4fd1ff);
-  border: none;
-  padding: 14px 20px;
-  border-radius: 999px;
-  color: #0b0f1a;
-  font-weight: 600;
-  cursor: pointer;
+  background:linear-gradient(135deg,var(--accent),#4fd1ff);
+  border:none; padding:14px 20px; border-radius:999px;
+  font-weight:600; cursor:pointer;
 }
+button:active { transform:scale(.96); }
 
-button:hover { transform: translateY(-2px); }
-button:active { transform: scale(0.96); }
-
-.progress {
-  height: 6px;
-  background: #2a2f55;
-  border-radius: 999px;
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-
+.progress { height:6px; background:#2a2f55; border-radius:999px; overflow:hidden; }
 .progress span {
-  display: block;
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--accent), #4fd1ff, var(--accent));
-  background-size: 200% 100%;
-  animation: flow 2s linear infinite;
-  transition: width 0.4s ease;
+  display:block; height:100%; width:0%;
+  background:linear-gradient(90deg,var(--accent),#4fd1ff);
+  transition:width .4s ease;
 }
 
-.scale {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 24px;
-}
-
+.scale { display:flex; flex-wrap:wrap; gap:8px; margin-top:20px; }
 .scale button {
-  flex: 1 1 calc(50% - 8px);
-  min-width: 120px;
-  background: #2a2f55;
-  color: white;
+  flex:1 1 calc(50% - 8px);
+  background:#2a2f55; color:white;
 }
+@media(min-width:520px){ .scale button{flex:1;} }
 
-@media (min-width: 520px) {
-  .scale button { flex: 1; }
-}
-
-.skip {
-  background: transparent;
-  color: var(--muted);
-  margin-top: 12px;
-}
-
-.result-bar { margin: 14px 0; }
-
-.bar {
-  height: 10px;
-  background: #2a2f55;
-  border-radius: 999px;
-  overflow: hidden;
-}
-
+.result-bar { margin:12px 0; }
+.bar { height:10px; background:#2a2f55; border-radius:999px; overflow:hidden; }
 .bar span {
-  display: block;
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--accent), #4fd1ff);
-  transition: width 0.9s cubic-bezier(.22,.61,.36,1);
+  display:block; height:100%; width:0%;
+  background:linear-gradient(90deg,var(--accent),#4fd1ff);
+  transition:width .8s ease;
 }
+hr { border:none; border-top:1px solid #2a2f55; margin:24px 0; }
+ul li { margin-bottom:6px; }
 
-hr {
-  border: none;
-  border-top: 1px solid #2a2f55;
-  margin: 28px 0;
-}
-
-ul li { margin-bottom: 6px; }
-
-@keyframes slideFadeIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes flow {
-  from { background-position: 0% 0; }
-  to { background-position: 200% 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(12px); }
+  to { opacity:1; transform:none; }
 }
 </style>
 </head>
 
 <body>
-<div class="container">
-  <div id="app"></div>
-</div>
+<div class="container"><div id="app"></div></div>
 
 <script>
+/* ================= CONFIG ================= */
+const SHOW_FAMOUS_EXAMPLES = true; // ← set FALSE to remove them entirely
+
+/* ================= DATA ================= */
 const DIMENSIONS = {
-  AC: { name: "Awareness vs Conditioning" },
-  FA: { name: "Fear-driven vs Autonomous" },
-  IR: { name: "Impulsive vs Reflective" },
-  HP: { name: "Hedonic vs Purpose-driven" }
+  AC:"Awareness", FA:"Autonomy", IR:"Reflectiveness", HP:"Purpose"
 };
 
 const QUESTIONS = [
-  { d:"AC", t:"I regularly question why I believe what I believe.", s:1 },
-  { d:"AC", t:"I follow social norms without thinking much about them.", s:-1 },
-  { d:"FA", t:"Fear of failure strongly influences my decisions.", s:-1 },
-  { d:"FA", t:"I act based on internal values, even under pressure.", s:1 },
-  { d:"IR", t:"I often act before thinking things through.", s:-1 },
-  { d:"IR", t:"I pause to consider long-term consequences.", s:1 },
-  { d:"HP", t:"I prioritize enjoyment over long-term meaning.", s:-1 },
-  { d:"HP", t:"I feel driven by a sense of purpose.", s:1 }
+  {d:"AC",t:"I question why I believe what I believe.",s:1},
+  {d:"AC",t:"I follow norms without reflection.",s:-1},
+  {d:"FA",t:"Fear of failure limits my choices.",s:-1},
+  {d:"FA",t:"I act from internal values.",s:1},
+  {d:"IR",t:"I act before thinking.",s:-1},
+  {d:"IR",t:"I consider long-term consequences.",s:1},
+  {d:"HP",t:"I prioritize comfort over meaning.",s:-1},
+  {d:"HP",t:"I tolerate discomfort for purpose.",s:1}
 ];
 
-const FIGURE_MAP = [
+const ARCHETYPES = [
   {
-    criteria: s => s.FA > 30 && s.IR > 30 && s.HP > 30,
-    description:
-      "Your pattern shows strong autonomy, reflective thinking, and a purpose-driven orientation.",
-    figures: [
-      { name:"Elon Musk", traits:"long-term vision, high risk tolerance, self-directed execution" },
-      { name:"Marie Curie", traits:"deep reflection, persistence, purpose over comfort" },
-      { name:"Nelson Mandela", traits:"internal values, long-term moral purpose, restraint" }
-    ]
+    name:"Strategic Architect",
+    traits:[
+      "High autonomy",
+      "Reflective decision-making",
+      "Long-term purpose orientation"
+    ],
+    famous:["Elon Musk","Marie Curie","Nelson Mandela"],
+    score:s=> (s.FA+s.IR+s.HP)/3
   },
   {
-    criteria: s => s.AC > 30 && s.IR > 30,
-    description:
-      "Your pattern emphasizes awareness and deliberate reflection before action.",
-    figures: [
-      { name:"Albert Einstein", traits:"conceptual depth, independent thinking, reflection" },
-      { name:"Hannah Arendt", traits:"metacognitive awareness, reflective judgment" }
-    ]
+    name:"Reflective Analyst",
+    traits:[
+      "High awareness",
+      "Deliberate thinking",
+      "Conceptual depth"
+    ],
+    famous:["Albert Einstein","Hannah Arendt"],
+    score:s=> (s.AC+s.IR)/2
   },
   {
-    criteria: s => s.FA > 30 && s.IR < -20,
-    description:
-      "Your pattern combines autonomy with rapid, instinctive action.",
-    figures: [
-      { name:"Richard Branson", traits:"decisive action, comfort with uncertainty" },
-      { name:"Theodore Roosevelt", traits:"energy, action orientation, decisiveness" }
-    ]
+    name:"Action-Oriented Pioneer",
+    traits:[
+      "High autonomy",
+      "Rapid execution",
+      "Comfort with uncertainty"
+    ],
+    famous:["Richard Branson","Theodore Roosevelt"],
+    score:s=> (s.FA - s.IR)
   }
 ];
 
-let state = { index: 0, answers: [] };
-const app = document.getElementById("app");
+/* ================= STATE ================= */
+let state={index:0,answers:[]};
+const app=document.getElementById("app");
 
-function start() {
-  state.index = 0;
-  state.answers = Array(QUESTIONS.length).fill(null);
+/* ================= FLOW ================= */
+function start(){
+  state.index=0;
+  state.answers=Array(QUESTIONS.length).fill(null);
   renderQuestion();
 }
 
-function renderIntro() {
-  app.innerHTML = `
+function renderIntro(){
+  app.innerHTML=`
     <div class="card">
       <h1>Personality Pattern Assessment</h1>
-      <p>Explores behavioral and cognitive patterns. Not a diagnosis.</p>
-      <button onclick="start()">Start Assessment</button>
+      <p>Explores behavioral tendencies. Not diagnostic or predictive.</p>
+      <button onclick="start()">Start</button>
     </div>`;
 }
 
-function renderQuestion() {
-  const q = QUESTIONS[state.index];
-  const progress = Math.round((state.index / QUESTIONS.length) * 100);
-
-  app.innerHTML = `
-    <div class="progress"><span style="width:${progress}%"></span></div>
+function renderQuestion(){
+  const q=QUESTIONS[state.index];
+  const p=Math.round(state.index/QUESTIONS.length*100);
+  app.innerHTML=`
+    <div class="progress"><span style="width:${p}%"></span></div>
     <div class="card">
       <h3>${q.t}</h3>
       <div class="scale">
@@ -224,78 +151,81 @@ function renderQuestion() {
             ${["Strongly Disagree","Disagree","Neutral","Agree","Strongly Agree"][v+2]}
           </button>`).join("")}
       </div>
-      <button class="skip" onclick="answer(null)">Skip</button>
     </div>`;
 }
 
-function answer(v) {
-  state.answers[state.index++] = v;
-  state.index < QUESTIONS.length ? renderQuestion() : renderResults();
+function answer(v){
+  state.answers[state.index++]=v;
+  state.index<QUESTIONS.length ? renderQuestion() : renderResults();
 }
 
-function calculateScores() {
-  let scores = { AC:0, FA:0, IR:0, HP:0 };
-  let counts = { AC:0, FA:0, IR:0, HP:0 };
-
+/* ================= SCORING ================= */
+function calculateScores(){
+  let s={AC:0,FA:0,IR:0,HP:0}, c={AC:0,FA:0,IR:0,HP:0};
   state.answers.forEach((a,i)=>{
     if(a!==null){
-      const q = QUESTIONS[i];
-      scores[q.d] += a * q.s;
-      counts[q.d]++;
+      s[QUESTIONS[i].d]+=a*QUESTIONS[i].s;
+      c[QUESTIONS[i].d]++;
     }
   });
-
-  for (let d in scores) {
-    const max = counts[d] * 2 || 1;
-    scores[d] = Math.round((scores[d] / max) * 100);
+  for(let d in s){
+    s[d]=Math.round((s[d]/(c[d]*2||1))*100);
   }
-  return scores;
+  return s;
 }
 
-function getFigureMatch(scores) {
-  return FIGURE_MAP.find(m => m.criteria(scores)) || null;
+function rankArchetypes(scores){
+  return ARCHETYPES
+    .map(a=>{
+      const raw=a.score(scores);
+      return {
+        ...a,
+        confidence:Math.min(100,Math.max(0,Math.round(Math.abs(raw))))
+      };
+    })
+    .filter(a=>a.confidence>25)
+    .sort((a,b)=>b.confidence-a.confidence);
 }
 
-function renderResults() {
-  const scores = calculateScores();
-  const match = getFigureMatch(scores);
+/* ================= RESULTS ================= */
+function renderResults(){
+  const scores=calculateScores();
+  const matches=rankArchetypes(scores);
 
-  app.innerHTML = `
+  app.innerHTML=`
     <div class="card">
       <h1>Results</h1>
 
       ${Object.entries(scores).map(([k,v])=>`
         <div class="result-bar">
-          <small>${DIMENSIONS[k].name}</small>
-          <div class="bar"><span data-width="${Math.abs(v)}%"></span></div>
+          <small>${DIMENSIONS[k]}</small>
+          <div class="bar"><span data-w="${Math.abs(v)}%"></span></div>
         </div>`).join("")}
 
-      ${match ? `
-        <hr>
-        <h3>Notable Figures With Similar Patterns</h3>
-        <p>${match.description}
-        These traits <em>share similarities with</em> patterns often associated with:</p>
+      <hr>
+      <h3>Archetype Matches</h3>
 
-        <ul>
-          ${match.figures.map(f=>`
-            <li><strong>${f.name}</strong> — ${f.traits}</li>
-          `).join("")}
-        </ul>
+      ${matches.map(m=>`
+        <p><strong>${m.name}</strong> — Confidence: ${m.confidence}%</p>
+        <ul>${m.traits.map(t=>`<li>${t}</li>`).join("")}</ul>
+        ${SHOW_FAMOUS_EXAMPLES ? `
+          <p style="font-size:.85rem;color:var(--muted)">
+            Illustrative examples often associated with similar patterns:
+            ${m.famous.join(", ")}
+          </p>` : ""}
+        <hr>`).join("")}
 
-        <p style="font-size:0.85rem;color:var(--muted)">
-          These comparisons are illustrative and based on publicly observed traits,
-          not psychological evaluation.
-        </p>
-      ` : ""}
+      <p style="font-size:.85rem;color:var(--muted)">
+        These results describe pattern resemblance only. They are illustrative,
+        non-clinical, and not predictive of outcomes or capability.
+      </p>
 
-      <button onclick="start()">Retake Test</button>
-    </div>
-  `;
+      <button onclick="start()">Retake</button>
+    </div>`;
 
   requestAnimationFrame(()=>{
-    document.querySelectorAll(".bar span").forEach(b=>{
-      b.style.width = b.dataset.width;
-    });
+    document.querySelectorAll(".bar span")
+      .forEach(b=>b.style.width=b.dataset.w);
   });
 }
 
