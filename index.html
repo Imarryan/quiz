@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mind & Psychology Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+         :root {
+            --primary: #6366f1;
+            --secondary: #0f172a;
+            --card: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --success: #16a34a;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: radial-gradient(circle at top left, #818cf8 0%, transparent 40%), radial-gradient(circle at bottom right, #38bdf8 0%, transparent 40%), linear-gradient(135deg, #020617, #0f172a);
+        }
+        
+        .app {
+            width: 100%;
+            max-width: 520px;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .6);
+        }
+        
+        h1 {
+            font-size: 1.7rem;
+            margin-bottom: 6px;
+        }
+        
+        .subtitle {
+            font-size: .9rem;
+            color: var(--muted);
+            margin-bottom: 20px;
+        }
+        
+        .progress,
+        .timer {
+            font-size: .85rem;
+            margin-bottom: 10px;
+        }
+        
+        .timer {
+            color: var(--primary);
+        }
+        
+        .question {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option {
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            cursor: pointer;
+            text-align: left;
+            font-size: .95rem;
+            transition: all .2s ease;
+        }
+        
+        .option:hover {
+            transform: translateY(-1px);
+            border-color: var(--primary);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, .15);
+        }
+        
+        .result {
+            text-align: center;
+        }
+        
+        .score {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin: 18px 0;
+        }
+        
+        .iq {
+            font-size: 1.25rem;
+            color: var(--success);
+            margin-bottom: 10px;
+        }
+        
+        .desc {
+            font-size: .95rem;
+            margin-bottom: 18px;
+            color: #1e293b;
+        }
+        
+        .disclaimer {
+            font-size: .8rem;
+            color: var(--muted);
+            margin-bottom: 22px;
+        }
+        
+        .restart {
+            padding: 14px 26px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            font-size: .95rem;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, .35);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app" id="app"></div>
+
+    <script>
+        /* ===== PSYCHOLOGY & PHILOSOPHY QUESTIONS ===== */
+        const questions = [{
+                q: "If all your memories disappeared, what would remain of you?",
+                o: ["Nothing", "Personality traits", "Only biology", "A core self beyond memory"],
+                a: 3
+            },
+
+            {
+                q: "Do you actually control your thoughts?",
+                o: ["Yes completely", "Mostly with effort", "Rarely", "Not at all"],
+                a: 2
+            },
+
+            {
+                q: "Which fear shapes human behavior the most?",
+                o: ["Failure", "Death", "Rejection", "Meaninglessness"],
+                a: 3
+            },
+
+            {
+                q: "Is suffering necessary for growth?",
+                o: ["Always", "Never", "Only extreme pain", "Awareness matters more"],
+                a: 3
+            },
+
+            {
+                q: "If truth causes pain and a lie brings peace, what is ethical?",
+                o: ["Truth always", "Peace always", "Depends on impact", "Neither"],
+                a: 2
+            },
+
+            {
+                q: "Are humans rational or emotional?",
+                o: ["Rational", "Emotional", "Equal", "Emotional first, rational later"],
+                a: 3
+            },
+
+            {
+                q: "Does free will truly exist?",
+                o: ["Yes", "No", "Partially", "Feels real even if false"],
+                a: 3
+            },
+
+            {
+                q: "What makes life meaningful?",
+                o: ["Happiness", "Success", "Purpose", "Awareness"],
+                a: 3
+            },
+
+            {
+                q: "Is morality learned or inherent?",
+                o: ["Learned", "Inherent", "Both", "Social construct"],
+                a: 2
+            },
+
+            {
+                q: "Why do people stay unhappy instead of changing?",
+                o: ["Laziness", "Fear", "Identity attachment", "Comfort in pain"],
+                a: 2
+            },
+
+            {
+                q: "Is ego an enemy or a tool?",
+                o: ["Enemy", "Tool", "Both", "Illusion"],
+                a: 2
+            },
+
+            {
+                q: "Do people seek truth or comfort?",
+                o: ["Truth", "Comfort", "Both", "Comfort disguised as truth"],
+                a: 3
+            },
+
+            {
+                q: "Is discipline a form of freedom?",
+                o: ["Yes", "No", "Externally", "Freedom through limits"],
+                a: 3
+            },
+
+            {
+                q: "What limits human potential most?",
+                o: ["Intelligence", "Resources", "Fear", "Conditioning"],
+                a: 3
+            },
+
+            {
+                q: "If no one judged you, how much would change?",
+                o: ["Nothing", "Little", "A lot", "Everything"],
+                a: 3
+            }
+        ];
+
+        let i = 0,
+            score = 0,
+            time = 15,
+            timer;
+        const app = document.getElementById("app");
+
+        function startTimer() {
+            time = 15;
+            timer = setInterval(() => {
+                time--;
+                document.getElementById("timer").textContent = `Time left: ${time}s`;
+                if (time === 0) {
+                    clearInterval(timer);
+                    next();
+                }
+            }, 1000);
+        }
+
+        function showQ() {
+            clearInterval(timer);
+            const q = questions[i];
+            app.innerHTML = `
+  <h1>Mind & Psychology Quiz</h1>
+  <div class="subtitle">Deep reflection · Entertainment only</div>
+  <div class="progress">Question ${i+1} of ${questions.length}</div>
+  <div class="timer" id="timer">Time left: 15s</div>
+  <div class="question">${q.q}</div>
+  <div class="options">
+   ${q.o.map((x,j)=>`<button class="option" onclick="ans(${j})">${x}</button>`).join("")}
+  </div>`;
+ startTimer();
+}
+
+function ans(j){
+ clearInterval(timer);
+ if(j===questions[i].a) score++;
+ next();
+}
+
+function next(){
+ i<questions.length-1 ? (i++,showQ()) : result();
+}
+
+function iqRange(s){
+ if(s<=5) return["Low Awareness","Surface-level thinking dominates."];
+ if(s<=10) return["Moderate Awareness","You reflect, but selectively."];
+ if(s<=14) return["High Awareness","You question deeply."];
+ return["Very High Awareness","You think beyond conditioning."];
+}
+
+function result(){
+ const r=iqRange(score);
+ app.innerHTML=`
+  <div class="result">
+   <h1>Your Result</h1>
+   <div class="score">${score}/${questions.length}</div>
+   <div class="iq">${r[0]}</div>
+   <div class="desc">${r[1]}</div>
+   <div class="disclaimer">
+    This quiz is for entertainment and self-reflection only.
+   </div>
+   <button class="restart" onclick="restart()">Restart Quiz</button>
+  </div>`;
+}
+
+function restart(){i=0;score=0;showQ();}
+showQ();
+    </script>
+
+</body>
+
+</html>
